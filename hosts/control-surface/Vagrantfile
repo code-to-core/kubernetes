@@ -14,5 +14,35 @@ Vagrant.configure("2") do |c|
             '--memory', '2048',
             '--cpus', '2'
          ]
-  end
+    end
+
+    # Provision Docker on the VM
+    c.vm.provision "docker" do |d|
+    end
+
+    # The next steps will install kubeadm, kubelet and kubectl
+    c.vm.provision :shell,
+    inline: "apt-get update && apt-get install -y apt-transport-https",
+    privileged: true
+
+    c.vm.provision :shell,
+    inline: "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -",
+    privileged: true
+
+    c.vm.provision :shell,
+    inline: "echo deb http://apt.kubernetes.io/ kubernetes-xenial main > /etc/apt/sources.list.d/kubernetes.list",
+    privileged: true
+
+    c.vm.provision :shell,
+    inline: "apt-get install -y kubelet kubeadm kubectl",
+    privileged: true
+
+    c.vm.provision :shell,
+    inline: "swapoff -a",
+    privileged: true
+
+    c.vm.provision :shell,
+    inline: "kubeadm init",
+    privileged: true
+
 end
