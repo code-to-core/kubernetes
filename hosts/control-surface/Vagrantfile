@@ -34,6 +34,10 @@ Vagrant.configure("2") do |c|
     privileged: true
 
     c.vm.provision :shell,
+    inline: "apt-get update",
+    privileged: true
+
+    c.vm.provision :shell,
     inline: "apt-get install -y kubelet kubeadm kubectl",
     privileged: true
 
