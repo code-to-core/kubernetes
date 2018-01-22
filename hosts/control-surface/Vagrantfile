@@ -1,18 +1,18 @@
 Vagrant.configure("2") do |c|
-    c.vm.box = "bento/ubuntu-16.04"
-    c.vm.hostname = "ethics-gradient"
 
-    # Create a public network, which generally matched to bridged network.
-    # Bridged networks make the machine appear as another physical device on
-    # your network.
-    c.vm.network "private_network", 
-        type: "dhcp"
+    c.vm.define "ethics-gradient" do |eg|
+        eg.vm.box = "bento/ubuntu-16.04"
+        eg.vm.hostname = "ethics-gradient"
 
-    #c.vm.network "public_network", 
-    #    use_dhcp_assigned_default_route: true,
-    #    :bridge => 'enp4s0'
-
-    c.vm.network "forwarded_port", guest:  6443, host: 6443
+        # Create a public network, which generally matched to bridged network.
+        # Bridged networks make the machine appear as another physical device on
+        # your network.
+        eg.vm.network "public_network", 
+            use_dhcp_assigned_default_route: true,
+            :bridge => 'enp4s0'
+        eg.vm.network "forwarded_port", guest:  6443, host: 6443
+        #eg.vm.network "private_network", type: "dhcp"
+    end
 
     c.vm.provider :virtualbox do |vb|
         vb.customize [
