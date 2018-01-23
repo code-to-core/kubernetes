@@ -10,7 +10,23 @@ Vagrant.configure("2") do |c|
         eg.vm.network "public_network", 
             use_dhcp_assigned_default_route: true,
             :bridge => 'enp4s0'
+
+        # Configure ports specific to Master
+
+        # Forward port for Kubernetes API server
         eg.vm.network "forwarded_port", guest:  6443, host: 6443
+
+        # Forward ports for etcd server client API
+        for i in 2379..2380
+            eg.vm.network :forwarded_port, guest: i, host: i
+        end
+
+        # Forward port for kube-scheduler
+        eg.vm.network "forwarded_port", guest:  10251, host: 10251
+
+        # Forward port for kube-controller-manager
+        eg.vm.network "forwarded_port", guest:  10252, host: 10252
+
         #eg.vm.network "private_network", type: "dhcp"
     end
 
@@ -24,6 +40,8 @@ Vagrant.configure("2") do |c|
         sco.vm.network "public_network", 
             use_dhcp_assigned_default_route: true,
             :bridge => 'wlan0'
+
+        # Configure ports specific for worker nodes
         sco.vm.network "forwarded_port", guest:  6443, host: 6443
         #sco.vm.network "private_network", type: "dhcp"
     end
@@ -55,6 +73,19 @@ Vagrant.configure("2") do |c|
             :bridge => 'wlp3s0f0'
         hm.vm.network "forwarded_port", guest:  6443, host: 6443
         #hm.vm.network "private_network", type: "dhcp"
+    end
+
+    # Forward ports common to master and worker nodes
+
+    # Forward port for Kubelet API
+    c.vm.network "forwarded_port", guest:  10250, host: 10250
+
+    # Forward port Read-only Kubelet API
+    c.vm.network "forwarded_port", guest:  10255, host: 10255
+
+    # Forward ports for Nodeport services
+    for i in 30000..32767
+        c.vm.network :forwarded_port, guest: i, host: i
     end
 
     c.vm.provider :virtualbox do |vb|
