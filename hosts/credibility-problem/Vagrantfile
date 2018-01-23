@@ -1,12 +1,61 @@
 Vagrant.configure("2") do |c|
-    c.vm.box = "bento/ubuntu-16.04"
-    c.vm.hostname = "serious-callers-only"
 
-    # Create a public network, which generally matched to bridged network.
-    # Bridged networks make the machine appear as another physical device on
-    # your network.
-    c.vm.network "public_network", type: "dhcp", :bridge => 'wlan0'
-    c.vm.network "forwarded_port", guest: 6443, host: 6443
+    c.vm.define "ethics-gradient" do |eg|
+        eg.vm.box = "bento/ubuntu-16.04"
+        eg.vm.hostname = "ethics-gradient"
+
+        # Create a public network, which generally matched to bridged network.
+        # Bridged networks make the machine appear as another physical device on
+        # your network.
+        eg.vm.network "public_network", 
+            use_dhcp_assigned_default_route: true,
+            :bridge => 'enp4s0'
+        eg.vm.network "forwarded_port", guest:  6443, host: 6443
+        #eg.vm.network "private_network", type: "dhcp"
+    end
+
+    c.vm.define "serious-callers-only" do |sco|
+        sco.vm.box = "bento/ubuntu-16.04"
+        sco.vm.hostname = "serious-callers-only"
+
+        # Create a public network, which generally matched to bridged network.
+        # Bridged networks make the machine appear as another physical device on
+        # your network.
+        sco.vm.network "public_network", 
+            use_dhcp_assigned_default_route: true,
+            :bridge => 'wlan0'
+        sco.vm.network "forwarded_port", guest:  6443, host: 6443
+        #sco.vm.network "private_network", type: "dhcp"
+    end
+
+    c.vm.define "contents-may-differ" do |cmd|
+        cmd.vm.box = "bento/ubuntu-16.04"
+        cmd.vm.hostname = "contents-may-differ"
+
+        # Create a public network, which generally matched to bridged network.
+        # Bridged networks make the machine appear as another physical device on
+        # your network.
+        cmd.vm.network "public_network", 
+            use_dhcp_assigned_default_route: true,
+            :bridge => 'enp2s0'
+        cmd.vm.network "forwarded_port", guest:  6443, host: 6443
+        #cmd.vm.network "private_network", type: "dhcp"
+    end
+
+
+    c.vm.define "honest-mistake" do |hm|
+        hm.vm.box = "bento/ubuntu-16.04"
+        hm.vm.hostname = "honest-mistake"
+
+        # Create a public network, which generally matched to bridged network.
+        # Bridged networks make the machine appear as another physical device on
+        # your network.
+        hm.vm.network "public_network", 
+            use_dhcp_assigned_default_route: true,
+            :bridge => 'wlp3s0f0'
+        hm.vm.network "forwarded_port", guest:  6443, host: 6443
+        #hm.vm.network "private_network", type: "dhcp"
+    end
 
     c.vm.provider :virtualbox do |vb|
         vb.customize [
@@ -50,8 +99,12 @@ Vagrant.configure("2") do |c|
     inline: "sysctl net.bridge.bridge-nf-call-iptables=1",
     privileged: true
 
-    c.vm.provision :shell,
-    inline: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml",
-    privileged: true
+    #c.vm.provision :shell,
+    #inline: "kubeadm init --pod-network-cidr=10.244.0.0/16",
+    #privileged: true
+
+#    c.vm.provision :shell,
+#    inline: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml",
+#    privileged: true
 
 end
